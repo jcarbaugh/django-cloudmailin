@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponseServerError
 import hashlib
 
 class MailHandler(object):
@@ -21,8 +21,11 @@ class MailHandler(object):
         
         if not self.is_valid_signature(request.POST, addr['secret']):
             return HttpResponseForbidden("invalid message signature", mimetype="text/plain")
-            
-        addr['callback'](**request.POST)
+        
+        try:
+            addr['callback'](**request.POST)
+        except Exception, e:
+            return HttpResponseServerError(e.message)
         
         resp = HttpResponse("")
         resp.csrf_exempt = True
@@ -38,7 +41,7 @@ class MailHandler(object):
             return params['signature'] == sig
     
     def register_address(self, address, secret, callback):
-        self._addresses[address] = {
+        self._addresses["<%s>" % address] = {
             'secret': secret,
             'callback': callback,
         }

@@ -5,6 +5,8 @@ import hashlib
 
 class MailHandler(object):
     
+    csrf_exempt = True
+    
     def __init__(self, *args, **kwargs):
         super(MailHandler, self).__init__(*args, **kwargs)
         self._addresses = {}
@@ -20,9 +22,11 @@ class MailHandler(object):
         if not self.is_valid_signature(request.POST, addr['secret']):
             return HttpResponseForbidden("invalid message signature", mimetype="text/plain")
             
-        addr['callback'](request.POST)
+        addr['callback'](**request.POST)
         
-        return HttpResponse("")
+        resp = HttpResponse("")
+        resp.csrf_exempt = True
+        return resp
     
     def is_valid_signature(self, params, secret):
         

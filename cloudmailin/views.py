@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidde
 import hashlib
 
 def generate_signature(params, secret):
-    sig = "".join(params[k] for k in sorted(params.keys()) if k != "signature")
-    return hashlib.md5(sig + secret).hexdigest()
+    sig = "".join(params[k].encode('utf-8') for k in sorted(params.keys()) if k != "signature")
+    sig = hashlib.md5(sig + secret).hexdigest()
+    return sig
 
 class MailHandler(object):
     
@@ -17,17 +18,21 @@ class MailHandler(object):
     
     def __call__(self, request, *args, **kwargs):
         
-        to = request.POST.get('to', None)
+        params = dict((k, v) for k, v in request.POST.iteritems())
+        
+        to = params.get('to', None)
         addr = self._addresses.get(to, None)
         
         if addr is None:
             return HttpResponseNotFound("recipient address is not found", mimetype="text/plain")
         
-        if not self.is_valid_signature(request.POST, addr['secret']):
-            return HttpResponseForbidden("invalid message signature", mimetype="text/plain")
-        
         try:
-            addr['callback'](**dict((k, v) for k, v in request.POST.iteritems()))
+        
+            if not self.is_valid_signature(params, addr['secret']):
+                return HttpResponseForbidden("invalid message signature", mimetype="text/plain")
+            
+            addr['callback'](**params)
+            
         except Exception, e:
             return HttpResponseServerError(e.message, mimetype="text/plain")
         

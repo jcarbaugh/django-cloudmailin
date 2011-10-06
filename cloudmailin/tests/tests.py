@@ -34,31 +34,39 @@ def generate_signature(params, secret):
     return sig
 
 class CloudMailinTestCase(TestCase):
-    
+
     def test_get(self):
         resp = self.client.get('/mail/')
         self.assertEquals(resp.status_code, 404)
         self.assertEquals(resp.content, "recipient address is not found")
-    
+
     def test_post(self):
         params = BASE_PARAMS.copy()
         params['signature'] = generate_signature(params, SECRET)
         resp = self.client.post('/mail/', params)
         self.assertEquals(resp.status_code, 200)
         self.assertEquals(resp.content, "")
-    
+
+    def test_post_disposable(self):
+        params = BASE_PARAMS.copy()
+        params['to'] = '<animaginaryperson+disposable@example.com>'
+        params['signature'] = generate_signature(params, SECRET)
+        resp = self.client.post('/mail/', params)
+        self.assertEquals(resp.status_code, 200)
+        self.assertEquals(resp.content, "")
+
     def test_post_noparams(self):
         resp = self.client.post('/mail/')
         self.assertEquals(resp.status_code, 404)
         self.assertEquals(resp.content, "recipient address is not found")
-    
+
     def test_post_invalidsig(self):
         params = BASE_PARAMS.copy()
         params['signature'] = generate_signature(params, SECRET) + "!"
         resp = self.client.post('/mail/', params)
         self.assertEquals(resp.status_code, 403)
         self.assertEquals(resp.content, "invalid message signature")
-    
+
     def test_post_invalidrecipient(self):
         params = BASE_PARAMS.copy()
         params['to'] = '<aninvalidemailaddress@example.com>'
@@ -66,7 +74,7 @@ class CloudMailinTestCase(TestCase):
         resp = self.client.post('/mail/', params)
         self.assertEquals(resp.status_code, 404)
         self.assertEquals(resp.content, "recipient address is not found")
-    
+
     def test_post_500(self):
         params = BASE_PARAMS.copy()
         params['to'] = '<500@example.com>'
@@ -74,7 +82,7 @@ class CloudMailinTestCase(TestCase):
         resp = self.client.post('/mail/', params)
         self.assertEquals(resp.status_code, 500)
         self.assertEquals(resp.content, "this is a made up exception")
-    
+
     def test_signature(self):
         self.assertEquals(
             real_generate_signature(BASE_PARAMS, SECRET),

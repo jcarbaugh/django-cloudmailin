@@ -21,6 +21,11 @@ class MailHandler(object):
         params = dict((k, v) for k, v in request.POST.iteritems())
         
         to = params.get('to', None)
+
+        if '+' in to:
+            lto  = to.split('+')
+            to = lto[0] + "@" + lto[1].split('@')[1]
+
         addr = self._addresses.get(to, None)
         
         if addr is None:

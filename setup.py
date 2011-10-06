@@ -15,6 +15,12 @@ setup(
     author_email='jcarbaugh@sunlightfoundation.com',
     url='http://github.com/sunlightlabs/django-cloudmailin/',
     packages=find_packages(),
+    package_data={
+        'locksmith': [
+            'cloudmailin/tests/*.sh',
+            'cloudmailin/tests/mail/*.txt',
+        ],
+    },
     license='BSD License',
     platforms=["any"],
     classifiers=[

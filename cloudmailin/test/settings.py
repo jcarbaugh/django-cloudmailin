@@ -6,7 +6,7 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'cloudmailin.tests',
+    'cloudmailin',
 )
 
-ROOT_URLCONF = 'cloudmailin.tests.urls'
+ROOT_URLCONF = 'cloudmailin.test.urls'

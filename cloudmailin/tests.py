@@ -9,7 +9,8 @@ import os
 PWD = os.path.abspath(os.path.dirname(__file__))
 
 def load_email(filename):
-    f = open(os.path.join(PWD, 'mail', filename))
+    mail_dir = os.path.join(PWD, 'test', 'mail', filename)
+    f = open(mail_dir)
     content = f.read()
     f.close()
     return content
@@ -34,6 +35,8 @@ def generate_signature(params, secret):
     return sig
 
 class CloudMailinTestCase(TestCase):
+
+    urls = 'cloudmailin.test.urls'
 
     def test_get(self):
         resp = self.client.get('/mail/')

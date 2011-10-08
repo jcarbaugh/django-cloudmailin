@@ -1,0 +1,1 @@
+django-admin.py test --settings=cloudmailin.test.settings --pythonpath=.

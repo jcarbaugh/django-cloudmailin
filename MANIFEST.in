@@ -1,4 +1,4 @@
 include LICENSE
 include README.rst
-recursive-include cloudmailin/tests/ *.sh
-recursive-include cloudmailin/tests/mail *.txt
+include requirements.txt
+recursive-include cloudmailin/tests *.sh *.txt

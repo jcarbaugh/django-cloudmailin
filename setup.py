@@ -17,8 +17,7 @@ setup(
     packages=find_packages(),
     package_data={
         'cloudmailin': [
-            'tests/*.sh',
-            'tests/mail/*.txt',
+            'test/mail/*.txt',
         ],
     },
     license='BSD License',
